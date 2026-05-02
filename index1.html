@@ -1,0 +1,328 @@
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080c14;--bg2:#0d1420;--bg3:#111a2e;--card:#0f1928;
+  --border:#1e2d45;--accent:#00e5ff;--accent2:#7c3aed;
+  --green:#00e676;--red:#ff1744;--yellow:#ffea00;--orange:#ff6d00;
+  --text:#e8f4f8;--muted:#5a7a9a;
+  --mono:'Courier New',monospace;--sans:system-ui,sans-serif
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex;height:600px;overflow:hidden;font-size:13px}
+.sidebar{width:60px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px}
+.nav-item{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s;color:var(--muted);border:none;background:transparent;position:relative}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(0,229,255,.12);color:var(--accent)}
+.nav-item .tip{position:absolute;left:50px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:11px;padding:3px 8px;border-radius:5px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s;z-index:100}
+.nav-item:hover .tip{opacity:1}
+.sidebar-bottom{margin-top:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0}
+.page-title{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.05em}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
+.network-pill{display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:3px 10px;font-size:11px;font-family:var(--mono);cursor:pointer}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#00e5ff);cursor:pointer;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.badge{font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:3px;font-weight:700;letter-spacing:.04em}
+.badge-green{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.badge-blue{background:rgba(0,229,255,.12);color:var(--accent);border:1px solid rgba(0,229,255,.25)}
+.badge-red{background:rgba(255,23,68,.12);color:var(--red);border:1px solid rgba(255,23,68,.25)}
+.badge-yellow{background:rgba(255,234,0,.12);color:var(--yellow);border:1px solid rgba(255,234,0,.25)}
+.badge-orange{background:rgba(255,109,0,.12);color:var(--orange);border:1px solid rgba(255,109,0,.25)}
+.badge-purple{background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.badge-tr{background:rgba(220,38,38,.15);color:#fca5a5;border:1px solid rgba(220,38,38,.3)}
+.content{flex:1;overflow-y:auto;padding:16px}
+.page{display:none;animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.s-blue::before{background:linear-gradient(90deg,var(--accent),transparent)}
+.s-green::before{background:linear-gradient(90deg,var(--green),transparent)}
+.s-purple::before{background:linear-gradient(90deg,var(--accent2),transparent)}
+.s-orange::before{background:linear-gradient(90deg,var(--orange),transparent)}
+.s-tr::before{background:linear-gradient(90deg,#ef4444,transparent)}
+.stat-val{font-family:var(--mono);font-size:22px;font-weight:700;margin:4px 0 2px}
+.stat-sub{font-size:10px;color:var(--muted)}
+.card-title{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-size:14px;font-weight:700}
+.sec-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.wallet-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.wallet-item:hover{border-color:var(--accent);background:rgba(0,229,255,.04)}
+.wicon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.log-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.log-item:last-child{border-bottom:none}
+.licon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.licon.in{background:rgba(0,230,118,.12)}
+.licon.out{background:rgba(0,229,255,.1)}
+.licon.fail{background:rgba(255,23,68,.12)}
+.licon.warn{background:rgba(255,234,0,.1)}
+.licon.tg{background:rgba(124,58,237,.15)}
+.toggle{width:38px;height:20px;background:var(--border);border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:white;top:3px;left:3px;transition:left .2s}
+.toggle.on::after{left:21px}
+.input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:var(--sans);font-size:12px;width:100%;outline:none}
+.input:focus{border-color:var(--accent)}
+.lbl{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500}
+.fg{margin-bottom:12px}
+.btn{padding:7px 14px;border-radius:8px;font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-p{background:var(--accent);color:#000}
+.btn-o{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn-g{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-d{background:rgba(255,23,68,.15);color:var(--red);border:1px solid rgba(255,23,68,.3)}
+.btn-sm{padding:4px 10px;font-size:10px;border-radius:6px}
+.select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:var(--sans);font-size:12px;width:100%;outline:none}
+.tabs{display:flex;gap:3px;margin-bottom:14px;background:var(--bg3);border-radius:10px;padding:3px}
+.tab{padding:6px 12px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;color:var(--muted);border:none;background:transparent}
+.tab.active{background:var(--card);color:var(--text)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.channel-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.ch-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.alert-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:6px}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.meter-bar{height:7px;background:var(--border);border-radius:3px;overflow:hidden;margin:6px 0}
+.meter-fill{height:100%;border-radius:3px}
+.notif-item{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border)}
+.notif-item:last-child{border-bottom:none}
+.ndot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:60px}
+.bar{flex:1;border-radius:3px 3px 0 0;cursor:pointer;min-width:0}
+.compliance-card{background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(220,38,38,.04));border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:12px;margin-bottom:8px}
+.tr-flag{font-size:14px}
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}
+.gap-8{gap:8px}.gap-12{gap:12px}.mt-4{margin-top:4px}.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mb-12{margin-bottom:12px}
+.text-muted{color:var(--muted)}.text-sm{font-size:11px}.text-xs{font-size:10px}.text-accent{color:var(--accent)}.text-green{color:var(--green)}.text-red{color:var(--red)}.text-yellow{color:var(--yellow)}.font-mono{font-family:var(--mono)}.fw-700{font-weight:700}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+
+<aside class="sidebar">
+  <div class="logo">🔔</div>
+  <button class="nav-item active" onclick="showPage('dashboard')">📊<span class="tip">Dashboard</span></button>
+  <button class="nav-item" onclick="showPage('wallets')">💳<span class="tip">Wallets</span></button>
+  <button class="nav-item" onclick="showPage('notifications')">🔔<span class="tip">Notifications</span></button>
+  <button class="nav-item" onclick="showPage('anomaly')">⚡<span class="tip">Anomaly</span></button>
+  <button class="nav-item" onclick="showPage('compliance')">📋<span class="tip">Compliance 🇹🇷</span></button>
+  <button class="nav-item" onclick="showPage('api')">🔗<span class="tip">API Gateway</span></button>
+  <div class="sidebar-bottom">
+    <button class="nav-item" onclick="showPage('settings')">⚙️<span class="tip">Settings</span></button>
+    <button class="nav-item" onclick="showPage('profile')">👤<span class="tip">Profile</span></button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <span class="page-title" id="page-label">// DASHBOARD</span>
+    <div class="topbar-right">
+      <div class="flex items-center gap-8 text-xs text-muted font-mono"><div class="dot"></div>Base Mainnet</div>
+      <div class="network-pill"><div class="dot"></div>0x71C...3d2E</div>
+      <div class="avatar" onclick="showPage('profile')">T</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="g4 mb-12">
+        <div class="stat-card s-blue"><div style="font-size:14px">💳</div><div class="card-title">Wallets</div><div class="stat-val">3</div><div class="stat-sub">Base + Lisk</div></div>
+        <div class="stat-card s-green"><div style="font-size:14px">✅</div><div class="card-title">Notif (24h)</div><div class="stat-val text-green">142</div><div class="stat-sub">↑ 12% kemarin</div></div>
+        <div class="stat-card s-purple"><div style="font-size:14px">⚡</div><div class="card-title">Anomali</div><div class="stat-val" style="color:var(--accent2)">7</div><div class="stat-sub">3 Failed, 4 Gas</div></div>
+        <div class="stat-card s-tr"><div style="font-size:14px">🇹🇷</div><div class="card-title">TR Compliance</div><div class="stat-val" style="color:#ef4444">2</div><div class="stat-sub">AML alerts aktif</div></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="sec-hdr"><div><div class="sec-title">Active Wallets</div><div class="sec-sub text-muted">Monitoring real-time</div></div><button class="btn btn-o btn-sm" onclick="showPage('wallets')">+ Tambah</button></div>
+          <div class="wallet-item"><div class="wicon" style="background:rgba(0,229,255,.1)">💳</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Main Base Wallet</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">0x71C7...3d2E</div></div><div style="text-align:right"><div class="font-mono text-accent" style="font-size:12px;font-weight:700">2.45 ETH</div><span class="badge badge-green" style="margin-top:3px;display:block">Base</span></div></div>
+          <div class="wallet-item"><div class="wicon" style="background:rgba(124,58,237,.15)">🏦</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Dev Fund Lisk</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">0x4A1F...9c0F</div></div><div style="text-align:right"><div class="font-mono text-accent" style="font-size:12px;font-weight:700">500 LSK</div><span class="badge badge-blue" style="margin-top:3px;display:block">Lisk</span></div></div>
+          <div class="wallet-item"><div class="wicon" style="background:rgba(255,109,0,.12)">💰</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Marketing Ops</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">0x8B3C...A12D</div></div><div style="text-align:right"><div class="font-mono text-accent" style="font-size:12px;font-weight:700">1,200 USDC</div><span class="badge badge-green" style="margin-top:3px;display:block">Base</span></div></div>
+        </div>
+        <div class="card">
+          <div class="sec-hdr"><div><div class="sec-title">Activity Log</div><div class="sec-sub text-muted">24 jam terakhir</div></div><button class="btn btn-g btn-sm" onclick="showPage('notifications')">Semua</button></div>
+          <div class="log-item"><div class="licon in">🟢</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Transfer IN — Main Wallet</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">0xabc...def · Base</div></div><div style="text-align:right"><div class="text-green font-mono" style="font-size:12px;font-weight:700">+0.5 ETH</div><div class="text-muted text-xs">2 mnt lalu</div></div></div>
+          <div class="log-item"><div class="licon fail">🔴</div><div style="flex:1"><div style="font-size:12px;font-weight:500">TX FAILED — Uniswap</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">OUT_OF_GAS · Base</div></div><div style="text-align:right"><div class="text-red font-mono" style="font-size:12px;font-weight:700">FAIL</div><div class="text-muted text-xs">15 mnt lalu</div></div></div>
+          <div class="log-item"><div class="licon warn">⚡</div><div style="flex:1"><div style="font-size:12px;font-weight:500">High Gas Alert</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">320 Gwei > 150 limit</div></div><div style="text-align:right"><div class="text-yellow font-mono" style="font-size:12px;font-weight:700">WARN</div><div class="text-muted text-xs">1 jam lalu</div></div></div>
+          <div class="log-item"><div class="licon tg">📨</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Telegram alert sent</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">TR user · @waverly_bot</div></div><div style="text-align:right"><div style="font-size:12px;font-weight:700;color:#a78bfa">TG ✓</div><div class="text-muted text-xs">2 jam lalu</div></div></div>
+        </div>
+      </div>
+      <div class="g2 mt-12">
+        <div class="card"><div class="card-title">Notifikasi / Jam</div><div class="chart-bars mt-8"><div class="bar" style="height:30%;background:var(--accent);opacity:.4"></div><div class="bar" style="height:45%;background:var(--accent);opacity:.5"></div><div class="bar" style="height:60%;background:var(--accent);opacity:.6"></div><div class="bar" style="height:80%;background:var(--accent);opacity:.7"></div><div class="bar" style="height:100%;background:var(--accent)"></div><div class="bar" style="height:75%;background:var(--accent);opacity:.7"></div><div class="bar" style="height:55%;background:var(--accent);opacity:.6"></div><div class="bar" style="height:65%;background:var(--accent);opacity:.65"></div><div class="bar" style="height:40%;background:var(--accent);opacity:.5"></div><div class="bar" style="height:50%;background:var(--accent);opacity:.55"></div><div class="bar" style="height:35%;background:var(--accent);opacity:.45"></div><div class="bar" style="height:20%;background:var(--accent);opacity:.35"></div></div><div class="flex justify-between mt-4 text-xs text-muted"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div></div>
+        <div class="card"><div class="card-title">System Health</div><div class="mt-8"><div class="flex justify-between items-center mb-8"><span class="text-sm">Base RPC</span><span class="badge badge-green">● ONLINE</span></div><div class="flex justify-between items-center mb-8"><span class="text-sm">Lisk RPC</span><span class="badge badge-green">● ONLINE</span></div><div class="flex justify-between items-center mb-8"><span class="text-sm">WhatsApp (Fonnte)</span><span class="badge badge-green">● ONLINE</span></div><div class="flex justify-between items-center mb-8"><span class="text-sm">Telegram Bot</span><span class="badge badge-green">● ONLINE</span></div><div class="flex justify-between items-center mb-8"><span class="text-sm">Email (Resend)</span><span class="badge badge-green">● ONLINE</span></div><div class="flex justify-between items-center"><span class="text-sm">TR Compliance Engine</span><span class="badge badge-blue">● ACTIVE</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- WALLETS -->
+    <div class="page" id="page-wallets">
+      <div class="sec-hdr mb-12"><div><div class="sec-title">Wallet Monitor</div><div class="sec-sub text-muted">Kelola wallet yang dipantau</div></div><button class="btn btn-p btn-sm">+ Tambah Wallet</button></div>
+      <div class="card mb-12">
+        <div class="fg"><div class="lbl">Nama Wallet</div><input class="input" placeholder="e.g. Main Wallet..." /></div>
+        <div class="g2"><div class="fg"><div class="lbl">Alamat Wallet (0x...)</div><input class="input" placeholder="0x71C7..." /></div><div class="fg"><div class="lbl">Jaringan</div><select class="select"><option>Base Mainnet</option><option>Base Sepolia</option><option>Lisk Mainnet</option></select></div></div>
+        <div class="fg"><div class="lbl">Saluran Notifikasi</div><select class="select"><option>WhatsApp + Email + Telegram</option><option>WhatsApp + Telegram</option><option>Email Only</option><option>Telegram Only</option><option>SMS (Netgsm - Turkey)</option></select></div>
+        <div class="g3 mt-8">
+          <div class="alert-row"><div style="font-size:15px">❌</div><div style="flex:1"><div style="font-size:12px;font-weight:500">TX Failed</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="alert-row"><div style="font-size:15px">⛽</div><div style="flex:1"><div style="font-size:12px;font-weight:500">High Gas</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="alert-row"><div style="font-size:15px">⏳</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Long Pending</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+        </div>
+        <div class="flex gap-8 mt-12"><button class="btn btn-p btn-sm">Simpan</button><button class="btn btn-g btn-sm">Batal</button></div>
+      </div>
+      <div class="card">
+        <div class="wallet-item"><div class="wicon" style="background:rgba(0,229,255,.1)">💳</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Main Base Wallet</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">0x71C7...3d2E</div></div><div class="flex gap-8"><span class="badge badge-green">Base</span><span class="badge badge-blue">Active</span></div><div class="flex gap-8 ml-8"><button class="btn btn-o btn-sm">Edit</button><button class="btn btn-g btn-sm">Pause</button></div></div>
+        <div class="wallet-item"><div class="wicon" style="background:rgba(124,58,237,.15)">🏦</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Dev Fund Lisk</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">0x4A1F...9c0F</div></div><div class="flex gap-8"><span class="badge badge-blue">Lisk</span><span class="badge badge-yellow">Paused</span></div><div class="flex gap-8 ml-8"><button class="btn btn-o btn-sm">Edit</button><button class="btn btn-g btn-sm">Resume</button></div></div>
+        <div class="wallet-item"><div class="wicon" style="background:rgba(255,109,0,.12)">💰</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Marketing Ops</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">0x8B3C...A12D</div></div><div class="flex gap-8"><span class="badge badge-green">Base</span><span class="badge badge-blue">Active</span></div><div class="flex gap-8 ml-8"><button class="btn btn-o btn-sm">Edit</button><button class="btn btn-d btn-sm">Hapus</button></div></div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="page" id="page-notifications">
+      <div class="sec-hdr mb-12"><div><div class="sec-title">Notification Center</div><div class="sec-sub text-muted">Semua notifikasi terkirim</div></div><div class="flex gap-8"><select class="select" style="width:auto;padding:6px 28px 6px 10px;font-size:11px"><option>Semua Channel</option><option>WhatsApp</option><option>Telegram</option><option>Email</option><option>SMS (TR)</option></select><select class="select" style="width:auto;padding:6px 28px 6px 10px;font-size:11px"><option>Semua Tipe</option><option>Transfer IN</option><option>Failed TX</option><option>AML Alert</option></select></div></div>
+      <div class="card">
+        <div class="notif-item"><div class="ndot" style="background:var(--green)"></div><div style="flex:1"><div style="font-size:12px;font-weight:600">🟢 Transfer IN — Main Base Wallet</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Diterima +0.5 ETH dari 0xabc...def · Base Mainnet</div><div class="flex gap-8 mt-6"><span class="badge badge-green">Transfer IN</span><span class="badge badge-blue">WhatsApp ✓</span><span class="badge badge-purple">Telegram ✓</span><span class="badge badge-blue">Email ✓</span></div><div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:5px">2 mnt lalu · 08 Mar 2025</div></div></div>
+        <div class="notif-item"><div class="ndot" style="background:var(--red)"></div><div style="flex:1"><div style="font-size:12px;font-weight:600">🔴 TX FAILED — Uniswap Swap</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Swap ETH→USDC GAGAL (OUT_OF_GAS). Coba naikkan Gas Limit +20%.</div><div class="flex gap-8 mt-6"><span class="badge badge-red">Failed TX</span><span class="badge badge-blue">WhatsApp ✓</span><span class="badge badge-purple">Telegram ✓</span></div><div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:5px">15 mnt lalu</div></div></div>
+        <div class="notif-item"><div class="ndot" style="background:#ef4444)"></div><div style="flex:1"><div style="font-size:12px;font-weight:600">🚨 AML Alert — TR Compliance</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Transfer besar terdeteksi: 50,000 USDT. Melebihi limit harian SPK/CMB Turki ($3,000). Wajib dilaporkan.</div><div class="flex gap-8 mt-6"><span class="badge badge-tr">AML Alert 🇹🇷</span><span class="badge badge-blue">WhatsApp ✓</span><span class="badge badge-purple">Telegram ✓</span></div><div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:5px">1 jam lalu</div></div></div>
+        <div class="notif-item"><div class="ndot" style="background:var(--yellow)"></div><div style="flex:1"><div style="font-size:12px;font-weight:600">⚡ High Gas Alert</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Gas price 320 Gwei melewati batas 150 Gwei. Tunggu hingga jaringan tidak sibuk.</div><div class="flex gap-8 mt-6"><span class="badge badge-yellow">High Gas</span><span class="badge badge-blue">Email ✓</span></div><div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:5px">2 jam lalu</div></div></div>
+      </div>
+    </div>
+
+    <!-- ANOMALY -->
+    <div class="page" id="page-anomaly">
+      <div class="sec-hdr mb-12"><div><div class="sec-title">Smart Anomaly Detection</div><div class="sec-sub text-muted">Analisis cerdas per transaksi</div></div><span class="badge badge-red">7 Anomali Aktif</span></div>
+      <div class="g3 mb-12">
+        <div class="card" style="text-align:center"><div class="card-title">Failed TX</div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--red);margin:8px 0">3</div><div class="text-xs text-muted">OUT_OF_GAS: 2x</div><div class="text-xs text-muted mt-4">REVERTED: 1x</div></div>
+        <div class="card" style="text-align:center"><div class="card-title">High Gas</div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--yellow);margin:8px 0">4</div><div class="text-xs text-muted">Max: 420 Gwei</div><div class="text-xs text-muted mt-4">Avg: 280 Gwei</div></div>
+        <div class="card" style="text-align:center"><div class="card-title">Long Pending</div><div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--green);margin:8px 0">0</div><div class="text-xs text-muted">Avg: 2.3s</div><div class="text-xs text-muted mt-4">All clear</div></div>
+      </div>
+      <div class="card mb-12">
+        <div class="card-title">⚡ Analisis TX Bermasalah</div>
+        <div class="log-item"><div class="licon fail">🔴</div><div style="flex:1"><div style="font-size:12px;font-weight:500">TX: 0x3f4a...b21c — Uniswap V3 Swap</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">FAILED · OUT_OF_GAS · Base</div></div><span class="badge badge-red">HIGH RISK</span></div>
+        <div class="g2 mt-12"><div><div class="lbl">Gas Used vs Limit</div><div class="meter-bar"><div class="meter-fill" style="width:100%;background:var(--red)"></div></div><div class="flex justify-between text-xs text-muted mt-4"><span>100% used</span><span>OUT OF GAS</span></div></div><div><div class="lbl">Network Congestion</div><div class="meter-bar"><div class="meter-fill" style="width:78%;background:var(--yellow)"></div></div><div class="flex justify-between text-xs text-muted mt-4"><span>78%</span><span>HIGH</span></div></div></div>
+        <div style="background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);border-radius:8px;padding:10px;margin-top:12px"><div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:4px">💡 Saran Sistem:</div><div class="text-sm text-muted">Naikkan Gas Limit minimal <strong style="color:var(--accent)">+20%</strong>. Gas Price 320 Gwei — tunggu turun ke &lt;150 Gwei.</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Konfigurasi Alert</div>
+        <div class="alert-row mt-8"><div style="font-size:15px">❌</div><div style="flex:1"><div style="font-size:12px;font-weight:500">TX Failed (REVERTED/OUT_OF_GAS)</div><div class="text-xs text-muted">Notif langsung saat gagal</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+        <div class="alert-row"><div style="font-size:15px">⛽</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Gas Fee Tinggi</div><div class="text-xs text-muted">Threshold: <input class="input" style="width:60px;display:inline;padding:3px 6px;font-size:11px" value="150" /> Gwei</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+        <div class="alert-row"><div style="font-size:15px">⏳</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Long Pending</div><div class="text-xs text-muted">Alert jika &gt; <input class="input" style="width:50px;display:inline;padding:3px 6px;font-size:11px" value="5" /> menit</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+        <button class="btn btn-p btn-sm mt-12">Simpan Konfigurasi</button>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE TR -->
+    <div class="page" id="page-compliance">
+      <div class="sec-hdr mb-12"><div><div class="sec-title">🇹🇷 Turkey Compliance Dashboard</div><div class="sec-sub text-muted">SPK/CMB · MASAK AML · Law 7518</div></div><span class="badge badge-tr">2 AML Alerts</span></div>
+      <div class="g3 mb-12">
+        <div class="stat-card s-tr"><div class="card-title">AML Alerts</div><div class="stat-val" style="color:#ef4444">2</div><div class="stat-sub">Transfer > limit SPK</div></div>
+        <div class="stat-card s-orange"><div class="card-title">TX Monitored</div><div class="stat-val text-accent">1,247</div><div class="stat-sub">30 hari terakhir</div></div>
+        <div class="stat-card s-green"><div class="card-title">Compliance Score</div><div class="stat-val text-green">94%</div><div class="stat-sub">MASAK standard</div></div>
+      </div>
+      <div class="card mb-12">
+        <div class="card-title">🚨 Active AML Alerts (MASAK)</div>
+        <div class="compliance-card">
+          <div class="flex justify-between items-center"><div><div style="font-size:12px;font-weight:600;color:#fca5a5">ALERT: Large Transfer Detected</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px">TX: 0x7f3a...c21d · 50,000 USDT · Base Mainnet</div></div><span class="badge badge-tr">OVER LIMIT</span></div>
+          <div class="flex gap-8 mt-8"><div><div class="text-xs text-muted">Amount</div><div style="font-family:var(--mono);font-size:12px;font-weight:700;color:#fca5a5">50,000 USDT</div></div><div><div class="text-xs text-muted">SPK Daily Limit</div><div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--yellow)">$3,000</div></div><div><div class="text-xs text-muted">Status</div><div style="font-size:11px;font-weight:600;color:#ef4444">WAJIB LAPOR</div></div></div>
+        </div>
+        <div class="compliance-card">
+          <div class="flex justify-between items-center"><div><div style="font-size:12px;font-weight:600;color:#fca5a5">ALERT: Rapid TX Pattern</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px">Wallet 0x4A1F...9c0F · 15 TX dalam 2 jam</div></div><span class="badge badge-yellow">SUSPICIOUS</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px">Pattern transaksi cepat berulang. Perlu review manual sesuai MASAK protocol.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Transaction Report — Export SPK</div>
+        <div class="g2">
+          <div><div class="fg"><div class="lbl">Periode</div><select class="select"><option>30 hari terakhir</option><option>7 hari</option><option>3 bulan</option></select></div><div class="fg"><div class="lbl">Format</div><select class="select"><option>CSV (SPK Format)</option><option>PDF Report</option><option>JSON</option></select></div></div>
+          <div><div class="lbl">Travel Rule Info</div><div style="background:rgba(0,229,255,.05);border:1px solid var(--border);border-radius:8px;padding:10px"><div class="text-xs text-muted mb-8">TX > TRY 15,000 wajib sertakan info sender/receiver sesuai Law 7518</div><div class="flex justify-between text-xs"><span class="text-muted">TX with travel rule:</span><span class="text-accent font-mono">47</span></div><div class="flex justify-between text-xs mt-4"><span class="text-muted">Compliant:</span><span class="text-green font-mono">44 (93.6%)</span></div></div></div>
+        </div>
+        <button class="btn btn-p btn-sm mt-12">Export Report</button>
+      </div>
+    </div>
+
+    <!-- API GATEWAY -->
+    <div class="page" id="page-api">
+      <div class="sec-hdr mb-12"><div><div class="sec-title">API Gateway & Channels</div><div class="sec-sub text-muted">Multi-channel notification setup</div></div></div>
+      <div class="g2 mb-12">
+        <div class="card">
+          <div class="card-title">Channel Connections</div>
+          <div class="channel-row mt-8"><div class="ch-icon" style="background:rgba(0,230,118,.12)">💬</div><div style="flex:1"><div style="font-size:12px;font-weight:600">WhatsApp (Fonnte)</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">fnt_*****4321</div></div><span class="badge badge-green">CONNECTED</span></div>
+          <div class="channel-row"><div class="ch-icon" style="background:rgba(124,58,237,.15)">📨</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Telegram Bot</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">@waverly_notif_bot</div></div><span class="badge badge-purple">CONNECTED</span></div>
+          <div class="channel-row"><div class="ch-icon" style="background:rgba(0,229,255,.1)">📧</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Email (Resend)</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">re_*****abc</div></div><span class="badge badge-green">CONNECTED</span></div>
+          <div class="channel-row"><div class="ch-icon" style="background:rgba(239,68,68,.12)">📱</div><div style="flex:1"><div style="font-size:12px;font-weight:600">SMS — Netgsm (Turkey)</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Untuk pengguna Turki</div></div><button class="btn btn-o btn-sm">Connect</button></div>
+          <div class="channel-row"><div class="ch-icon" style="background:rgba(255,109,0,.12)">🔗</div><div style="flex:1"><div style="font-size:12px;font-weight:600">Webhook (B2B)</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">myapp.com/webhook</div></div><span class="badge badge-blue">ACTIVE</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Delivery Stats (7 Hari)</div>
+          <div class="chart-bars mt-12" style="height:80px"><div class="bar" style="height:60%;background:var(--green)"></div><div class="bar" style="height:75%;background:var(--green)"></div><div class="bar" style="height:50%;background:var(--green)"></div><div class="bar" style="height:90%;background:var(--green)"></div><div class="bar" style="height:100%;background:var(--green)"></div><div class="bar" style="height:80%;background:var(--green)"></div><div class="bar" style="height:70%;background:var(--green)"></div></div>
+          <div class="flex justify-between mt-4 text-xs text-muted"><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span></div>
+          <div class="divider"></div>
+          <div class="flex justify-between"><div><div class="text-xs text-muted">Success Rate</div><div class="fw-700 text-green font-mono mt-4" style="font-size:16px">98.7%</div></div><div><div class="text-xs text-muted">Avg Latency</div><div class="fw-700 text-accent font-mono mt-4" style="font-size:16px">1.2s</div></div><div><div class="text-xs text-muted">Total Sent</div><div class="fw-700 font-mono mt-4" style="font-size:16px">1,428</div></div></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title">Developer API Key (B2B)</div><div class="fg mt-8"><div class="lbl">API Key</div><div class="flex gap-8"><input class="input" value="ngw_live_sk_********************9c0F" readonly style="font-family:var(--mono);font-size:11px" /><button class="btn btn-g btn-sm">Copy</button><button class="btn btn-d btn-sm">Regen</button></div></div><div class="text-xs text-muted">Gunakan untuk integrasi B2B — BtcTurk, Paribu, Bitci, atau aplikasi kamu sendiri.</div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="sec-hdr mb-12"><div class="sec-title">Settings</div></div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(this,'t-general')">General</button>
+        <button class="tab" onclick="switchTab(this,'t-notif')">Notifikasi</button>
+        <button class="tab" onclick="switchTab(this,'t-security')">Security</button>
+        <button class="tab" onclick="switchTab(this,'t-billing')">Billing</button>
+        <button class="tab" onclick="switchTab(this,'t-turkey')">🇹🇷 Turkey</button>
+      </div>
+      <div class="tab-content active" id="t-general">
+        <div class="g2"><div class="card"><div class="card-title">Preferensi Umum</div><div class="fg mt-8"><div class="lbl">Bahasa</div><select class="select"><option>Bahasa Indonesia</option><option>English</option><option>Türkçe</option></select></div><div class="fg"><div class="lbl">Timezone</div><select class="select"><option>Asia/Jakarta (WIB)</option><option>Europe/Istanbul (TRT)</option><option>UTC</option></select></div><button class="btn btn-p btn-sm mt-4">Simpan</button></div><div class="card"><div class="card-title">Tampilan</div><div class="alert-row mt-8"><div style="font-size:14px">🌙</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Dark Mode</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div><div class="alert-row"><div style="font-size:14px">🔊</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Suara Alert</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div><div class="alert-row"><div style="font-size:14px">📊</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Analytics</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div></div></div>
+      </div>
+      <div class="tab-content" id="t-notif">
+        <div class="card"><div class="card-title">Channel Notifikasi</div><div class="alert-row mt-8"><div style="font-size:14px">💬</div><div style="flex:1"><div style="font-size:12px;font-weight:500">WhatsApp</div><div class="text-xs text-muted">+62 812 ****4321</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div><div class="alert-row"><div style="font-size:14px">📨</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Telegram</div><div class="text-xs text-muted">@waverly_bot connected</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div><div class="alert-row"><div style="font-size:14px">📧</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Email</div><div class="text-xs text-muted">teddy@example.com</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div><div class="alert-row"><div style="font-size:14px">📱</div><div style="flex:1"><div style="font-size:12px;font-weight:500">SMS (Netgsm - TR)</div><div class="text-xs text-muted">Belum terhubung</div></div><button class="toggle" onclick="this.classList.toggle('on')"></button></div><div class="divider"></div><div class="lbl">Quiet Hours</div><div class="flex gap-8 mt-4"><div style="flex:1"><div class="lbl">Dari</div><input class="input" type="time" value="23:00" /></div><div style="flex:1"><div class="lbl">Sampai</div><input class="input" type="time" value="07:00" /></div></div><button class="btn btn-p btn-sm mt-12">Simpan</button></div>
+      </div>
+      <div class="tab-content" id="t-security">
+        <div class="card"><div class="card-title">Keamanan</div><div class="alert-row mt-8"><div style="font-size:14px">🔐</div><div style="flex:1"><div style="font-size:12px;font-weight:500">2FA</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div><div class="alert-row"><div style="font-size:14px">🔑</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Sign-in with Ethereum</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div><div class="divider"></div><div style="background:rgba(0,229,255,.06);border:1px solid var(--border);border-radius:8px;padding:10px"><div class="text-xs text-muted">⚠️ Hanya membutuhkan <strong style="color:var(--accent)">Public Address</strong>. Private Key tidak pernah diminta.</div></div></div>
+      </div>
+      <div class="tab-content" id="t-billing">
+        <div class="card"><div class="card-title">Kredit & Billing</div><div class="flex items-center gap-12 mt-8"><div><div class="text-xs text-muted">Saldo</div><div class="font-mono text-accent fw-700" style="font-size:22px">850 <span style="font-size:12px">notif</span></div></div><div class="meter-bar" style="flex:1;height:10px"><div class="meter-fill" style="width:57%;background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div></div><div class="divider"></div><div class="g3 mt-4"><div class="card" style="padding:10px;cursor:pointer"><div style="font-size:12px;font-weight:700">Starter</div><div class="font-mono text-accent" style="font-size:16px;font-weight:700;margin:4px 0">0.005 ETH</div><div class="text-xs text-muted">500 notif</div><button class="btn btn-o btn-sm mt-8" style="width:100%">Top-Up</button></div><div class="card" style="padding:10px;cursor:pointer;border-color:var(--accent)"><div style="font-size:12px;font-weight:700">Popular</div><div class="font-mono text-accent" style="font-size:16px;font-weight:700;margin:4px 0">0.01 ETH</div><div class="text-xs text-muted">1,500 notif</div><button class="btn btn-p btn-sm mt-8" style="width:100%">Top-Up</button></div><div class="card" style="padding:10px;cursor:pointer"><div style="font-size:12px;font-weight:700">Pro</div><div class="font-mono text-accent" style="font-size:16px;font-weight:700;margin:4px 0">0.05 ETH</div><div class="text-xs text-muted">10,000 notif</div><button class="btn btn-o btn-sm mt-8" style="width:100%">Top-Up</button></div></div><div class="text-xs text-muted mt-8">💡 Bayar via Base ETH, USDC, atau USDT (stablecoin untuk user Turki).</div></div>
+      </div>
+      <div class="tab-content" id="t-turkey">
+        <div class="card"><div class="card-title">🇹🇷 Turkey Market Settings</div><div class="fg mt-8"><div class="lbl">Bahasa Notifikasi</div><select class="select"><option>Bahasa Indonesia</option><option>Türkçe (Turkish)</option><option>English</option></select></div><div class="fg"><div class="lbl">SMS Provider (Turki)</div><select class="select"><option>Netgsm (Recommended)</option><option>Twilio Turkey</option><option>İletimerkezi</option></select></div><div class="fg"><div class="lbl">SPK/CMB Compliance Mode</div><div class="alert-row" style="margin-bottom:0"><div style="font-size:14px">📋</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Auto AML Monitoring</div><div class="text-xs text-muted">Aktifkan sesuai Law 7518</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div></div><div class="fg"><div class="lbl">Daily Transfer Limit Alert (SPK)</div><input class="input" value="3000" /><div class="text-xs text-muted mt-4">Alert jika transfer melebihi $3,000/hari (SPK regulation)</div></div><div class="fg"><div class="lbl">Travel Rule Threshold (TRY)</div><input class="input" value="15000" /><div class="text-xs text-muted mt-4">Wajib sertakan info sender/receiver di atas nominal ini</div></div><button class="btn btn-p btn-sm mt-4">Simpan Turkey Settings</button></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="page" id="page-profile">
+      <div style="background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(0,229,255,.1));border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;gap:16px;align-items:center;margin-bottom:14px">
+        <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#00e5ff);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;border:3px solid var(--accent);flex-shrink:0">T</div>
+        <div style="flex:1"><div style="font-size:18px;font-weight:700;margin-bottom:4px">Teddy L.</div><span class="badge badge-blue">🔥 Pro Plan</span><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px">0x71C7...3d2E · Base Mainnet</div><div class="text-xs text-muted mt-4">Member sejak Maret 2025 · 1,250 notif terkirim</div></div>
+        <button class="btn btn-o btn-sm">Edit Profil</button>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="card-title">Info Akun</div><div class="fg mt-8"><div class="lbl">Nama</div><input class="input" value="Teddy L." /></div><div class="fg"><div class="lbl">Email</div><input class="input" value="teddy@example.com" /></div><div class="fg"><div class="lbl">WhatsApp</div><input class="input" value="+62 812 ****4321" /></div><div class="fg"><div class="lbl">Telegram</div><input class="input" value="@teddyl" /></div><button class="btn btn-p btn-sm">Simpan</button></div>
+        <div class="card"><div class="card-title">Plan & Statistik</div><div class="mt-8"><div class="flex justify-between items-center mb-10"><span class="text-sm">Plan Aktif</span><span class="badge badge-blue">Pro</span></div><div class="flex justify-between items-center mb-10"><span class="text-sm">Wallets</span><span class="fw-700 text-accent">3 / 10</span></div><div class="flex justify-between items-center mb-10"><span class="text-sm">Notif Terkirim</span><span class="fw-700">1,250</span></div><div class="flex justify-between items-center mb-10"><span class="text-sm">Anomali Terdeteksi</span><span class="fw-700 text-yellow">42</span></div><div class="flex justify-between items-center mb-10"><span class="text-sm">TR Compliance</span><span class="badge badge-tr">Active 🇹🇷</span></div><div class="flex justify-between items-center"><span class="text-sm">Kredit</span><span class="fw-700 text-accent font-mono">850</span></div></div><div class="divider"></div><button class="btn btn-o btn-sm" onclick="showPage('settings')">Upgrade Plan →</button></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const pages={dashboard:'// DASHBOARD',wallets:'// WALLET MONITOR',notifications:'// NOTIFICATION CENTER',anomaly:'// ANOMALY DETECTION',compliance:'// COMPLIANCE 🇹🇷',api:'// API GATEWAY',settings:'// SETTINGS',profile:'// PROFILE'};
+const navMap=['dashboard','wallets','notifications','anomaly','compliance','api','settings','profile'];
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id)?.classList.add('active');
+  document.getElementById('page-label').textContent=pages[id]||'// PAGE';
+  const idx=navMap.indexOf(id);
+  if(idx!==-1)document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
+}
+function switchTab(btn,tabId){
+  btn.closest('.page').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.closest('.page').querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tabId)?.classList.add('active');
+}
+</script>
